@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th = "http://www.thymeleaf.org">
+
+<head th:replace = "/fragments/head"></head>
+
+<body>
+
+	<nav th:replace = "/fragments/nav :: nav-admin"></nav>
+	
+	<div class="container">
+
+			<h1 class = "display-2">Pages</h1>
+		
+			<a href = "/admin/pages/add" class = "btn btn-primary mb-5">Add new</a>
+			
+			<div th:if="${message}" th:text = "${message}" th:class = "${'alert' + alertClass}"></div>
+			
+			<div th:if="${!pages.empty}">
+				<table class = "table sorting" id = "pages">
+						<tr class = "home">
+							<th>Title</th>
+							<th>Slug</th>
+							<th>Edit</th>
+							<th>Delete</th>
+						</tr>
+						<tr th:each="tempPage : ${pages}" th:id = "'id_' + ${tempPage.id}" th:class = "${tempPage.slug}">
+							<td th:text = "${tempPage.title}"></td>
+							<td th:text = "${tempPage.slug}"></td>
+							<td><a th:href = "@{'/admin/pages/edit/' + ${tempPage.id}}">Edit</a></td>
+							<td><a th:if = "${tempPage.slug != 'home'}" th:href = "@{'/admin/pages/delete/' + ${tempPage.id}}" class = "confirmDeletion">Delete</a></td>
+						</tr>
+				</table>
+			</div>
+			
+			<div th:unless="${!pages.empty}">
+				<p>There are NO pages</p>
+				<h4 class = "display-4">There are no pages at the moment.</h4>
+			</div>
+	
+	</div>
+	
+	<div th:replace = "/fragments/footer"></div>
+	
+	<script>
+		$("table#pages tbody").sortable({
+			items: "tr:not(.home)" ,
+			placeholder: "ui-state-highlight",
+			update: function(){
+				let ids = $("table#pages tbody").sortable("serialize");
+				let url = "/admin/pages/reorder";
+				
+				$.post(url , ids , function(data){
+					console.log(data);
+				});
+			}
+		});
+	</script>
+
+</body>
+</html>
